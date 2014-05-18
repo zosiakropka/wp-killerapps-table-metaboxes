@@ -1,4 +1,4 @@
-wp-killerapps-table-metaboxes
-=============================
+Killer Apps Table Metaboxes
+===========================
 
-Table metabox wizard for wordpress
+WordPress plugin for defining table-based metaboxes.

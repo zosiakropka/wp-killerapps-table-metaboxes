@@ -1,0 +1,27 @@
+.killerapps-table-metaboxes table {
+	width: 100%;
+	margin: 16px 0;
+	margin: 1.6rem 0;
+	border: 1px solid #DDD;
+	text-align: left;
+	box-shadow: 0 2px 1px rgba(0,0,0,0.05);
+}
+.killerapps-table-metaboxes th {
+	border-bottom: 1px dashed #EEE;
+}
+.killerapps-table-metaboxes th, .killerapps-table-metaboxes td {
+	padding: 4px;
+	padding: 0.4rem;
+}
+.killerapps-table-metaboxes tbody tr:nth-child(even) {
+	background-color: #F8F8F9;
+}
+.killerapps-table-metaboxes table .no-rows {
+	font-style: italic;
+}
+.killerapps-table-metaboxes table .no-rows.hide {
+	display: none;
+}
+.killerapps-table-metaboxes .row-template {
+	display: none;
+}
