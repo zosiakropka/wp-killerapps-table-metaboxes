@@ -15,4 +15,5 @@ function killerapps_table_metaboxes_admin_enqueue() {
 	wp_enqueue_style( 'killerapps-table-metaboxes', plugins_url( '/css/table-metaboxes.css', __FILE__ ) );
 	wp_enqueue_script( 'killerapps-table-metaboxes', plugins_url( '/js/table-metaboxes.js', __FILE__), array('jquery'));
 	wp_enqueue_script( 'jquery-slugify', plugins_url( '/js/slugify/slugify.js', __FILE__), array('jquery'));
+	wp_enqueue_script( 'jquery-json', plugins_url( '/js/jquery.json-2.4.min.js', __FILE__), array('jquery'));
 }
