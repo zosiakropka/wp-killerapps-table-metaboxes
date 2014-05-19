@@ -164,6 +164,7 @@ class killerapps_TableMetabox {
 
 	private function _dynamic_columns($post_id) {
 		$data = get_post_meta($post_id, $this->slug, TRUE);
+		if (!$data) return array();
 		$columns = array();
 		foreach ($data['dynamic'] as $id => $label) {
 			$columns[] = array (
@@ -182,6 +183,7 @@ class killerapps_TableMetabox {
 
 	private function _rows($post_id) {
 		$data = get_post_meta($post_id, $this->slug, TRUE);
+		if (!$data) return array();
 		return $data['rows'];
 	}
 
