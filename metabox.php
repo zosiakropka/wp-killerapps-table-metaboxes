@@ -111,14 +111,14 @@ class killerapps_TableMetabox {
 					<tbody>
 						<?php foreach ($this->_rows($post->ID) as $row): ?>
 							<tr>
-								<?php foreach ($this->static_columns_start as $cell): ?>
-									<td class="static static_start"><?php echo $row[$cell['id']]?"TRUE":"FALSE" ?></td>
+								<?php foreach ($this->static_columns_start as $cell): $slug = $cell['id']; $value = $row[$slug]; ?>
+									<td class="static static_start"><?php $this->_cell_html($cell, $value); ?></td>
 								<?php endforeach ?>
-								<?php foreach ($this->_dynamic_columns($post->ID) as $cell): $value = $row[$cell['id']]; $slug = $cell['id']; ?>
-									<td class="<?php echo $cell['id'] ?> dynamic"><?php if ($cell['type'] == 'checkbox') echo $value?"TRUE":"FALSE"; else echo "<input  class='text dynamic-value value'  data-killerapps-slug='{$slug}' value='{$value}'/>"; ?></td>
+								<?php foreach ($this->_dynamic_columns($post->ID) as $cell): $slug = $cell['id']; $value = $row[$slug]; ?>
+									<td class="<?php echo $cell['id'] ?> dynamic"><?php $this->_cell_html($cell, $value) ?></td>
 								<?php endforeach ?>
-								<?php foreach ($this->static_columns_end as $cell): ?>
-									<td class="static static_end"><?php echo $row[$cell['id']]?"TRUE":"FALSE" ?></td>
+								<?php foreach ($this->static_columns_end as $cell): $slug = $cell['id']; $value = $row[$slug]; ?>
+									<td class="static static_end"><?php $this->_cell_html($cell, $value); ?></td>
 								<?php endforeach ?>
 								<td action="rows-actions">x </td>
 							</tr>
@@ -185,11 +185,19 @@ class killerapps_TableMetabox {
 		return $data['rows'];
 	}
 
-	private function _cell_html($column) {
-		$type = $column['type'] ? $column['type'] : 'text';
-		$slug = $column['id'];
-		if (!$column['options'] || !$column['options']['multi']) {
-			echo "<input type='{$type}' class='$type' data-killerapps-slug='{$slug}'/>";
+	private function _cell_html($cell, $value="") {
+		$type = $cell['type'] ? $cell['type'] : 'text';
+		$slug = $cell['id'];
+		if (!$cell['options'] || !$cell['options']['multi']) {
+			switch ($type) {
+				case "checkbox":
+					$checked = $value?'checked':'';
+					echo "<input type='{$type}' class='$type' data-killerapps-slug='{$slug}' value='{$value}' {$checked}/>";
+					break;
+				default:
+					echo "<input type='{$type}' class='$type' data-killerapps-slug='{$slug}' value='{$value}'/>";
+					break;
+			}
 		}
 	}
 }
