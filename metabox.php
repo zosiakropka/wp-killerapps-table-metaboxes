@@ -61,13 +61,19 @@ class killerapps_TableMetabox {
 		// @todo check permissions
 
 		$json = $_POST[$param];
+
 		if ($json) {
 			$data = json_decode(str_replace('\\"', '"', $json), TRUE);
 	
 			$dynamic = $data['dynamic'];
 			$rows = $data['rows'];
-	
-			update_post_meta($post_id, $this->slug, $data);
+
+			if (get_post_meta($post_id, $this->slug)) {
+				update_post_meta($post_id, $this->slug, $data);
+			} else {
+				add_post_meta($post_id, $this->slug, $data, TRUE);
+			}
+
 			// @todo validate&sanitize data
 		}
 	}
@@ -109,16 +115,16 @@ class killerapps_TableMetabox {
 						<th class="static rows-actions"><?php _e('Actions') ?></th>
 					</tr></thead>
 					<tbody>
-						<?php foreach ($this->_rows($post->ID) as $row): ?>
+						<?php foreach ($this->_rows($post->ID) as $row_id => $row): ?>
 							<tr>
 								<?php foreach ($this->static_columns_start as $cell): $slug = $cell['id']; $value = $row[$slug]; ?>
-									<td class="static static_start"><?php $this->_cell_html($cell, $value); ?></td>
+									<td class="static static_start"><?php $this->_cell_html($row_id, $cell, $value); ?></td>
 								<?php endforeach ?>
 								<?php foreach ($this->_dynamic_columns($post->ID) as $cell): $slug = $cell['id']; $value = $row[$slug]; ?>
-									<td class="<?php echo $cell['id'] ?> dynamic"><?php $this->_cell_html($cell, $value) ?></td>
+									<td class="<?php echo $cell['id'] ?> dynamic"><?php $this->_cell_html($row_id, $cell, $value) ?></td>
 								<?php endforeach ?>
 								<?php foreach ($this->static_columns_end as $cell): $slug = $cell['id']; $value = $row[$slug]; ?>
-									<td class="static static_end"><?php $this->_cell_html($cell, $value); ?></td>
+									<td class="static static_end"><?php $this->_cell_html($row_id, $cell, $value); ?></td>
 								<?php endforeach ?>
 								<td action="rows-actions">x </td>
 							</tr>
@@ -141,13 +147,13 @@ class killerapps_TableMetabox {
 
 						<tr class="row-template">
 						<?php foreach ($this->static_columns_start as $column): ?>
-							<td class="<?php echo $column['id'] ?> static static_start"><?php $this->_cell_html($column)?></td>
+							<td class="<?php echo $column['id'] ?> static static_start"><?php $this->_cell_html(NULL, $column)?></td>
 						<?php endforeach ?>
 						<?php foreach ($this->_dynamic_columns($post->ID) as $column): ?>
-							<td class="<?php echo $column['id'] ?> dynamic"><?php $this->_cell_html($column)?></td>
+							<td class="<?php echo $column['id'] ?> dynamic"><?php $this->_cell_html(NULL, $column)?></td>
 						<?php endforeach ?>
 						<?php foreach ($this->static_columns_end as $column): ?>
-							<td class="<?php echo $column['id'] ?> static static_end"><?php $this->_cell_html($column)?></td>
+							<td class="<?php echo $column['id'] ?> static static_end"><?php $this->_cell_html(NULL, $column)?></td>
 						<?php endforeach ?>
 						<td class="static rows-actions"><input type="button" class="button remove remove_row" value="X"/></td>
 						</tr>
@@ -171,7 +177,7 @@ class killerapps_TableMetabox {
 				'id' => $id,
 				'label' => $label,
 				'type' => $text,
-				'dynamic' => TRUE
+				'dynamic' => TRUE,
 			);
 		}
 		return $columns;
@@ -187,14 +193,29 @@ class killerapps_TableMetabox {
 		return $data['rows'];
 	}
 
-	private function _cell_html($cell, $value="") {
+	private function _cell_html($row_id, $cell, $value=NULL) {
+		if (!$value) {
+			$value = ($cell['std'])?$cell['std']:'';
+		}
 		$type = $cell['type'] ? $cell['type'] : 'text';
 		$slug = $cell['id'];
-		if (!$cell['options'] || !$cell['options']['multi']) {
+		$name = "killerapps_table_metabox_{$row_id}_{$slug}";
+		if (!$cell['options'] || !$cell['multi']) {
 			switch ($type) {
 				case "checkbox":
 					$checked = $value?'checked':'';
 					echo "<input type='{$type}' class='$type' data-killerapps-slug='{$slug}' value='{$value}' {$checked}/>";
+					break;
+				case "radio":
+					if (is_array($cell['options']) && sizeof($cell['options'])) {
+						echo "<ul>";
+						foreach ($cell['options'] as $opt_value => $label) {
+							$opt_id = "{$name}_{$opt_value}";
+							$checked = ($opt_value == $value)?"checked":"";
+							echo "<li><input id='{$opt_id}' name='{$name}' type='radio' class='radio' data-killerapps-slug='{$slug}' value='{$opt_value}' {$checked}/> <label for='{$opt_id}'>{$label}</label></li>";
+						}
+						echo "</ul>";
+					}
 					break;
 				default:
 					echo "<input type='{$type}' class='$type' data-killerapps-slug='{$slug}' value='{$value}'/>";

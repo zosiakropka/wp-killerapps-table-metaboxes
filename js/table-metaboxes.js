@@ -29,13 +29,21 @@
 				cells = $(this).find('td');
 				cells.each(function() {
 					if (! $(this).hasClass('rows-actions')) {
-						var input = $(this).find('input').first();
-						var slug = input.data('killerapps-slug');
-						if (input.attr('type') == 'checkbox') {
-							row[slug] = input.is(':checked');
-						} else {
-							row[slug] = input.val();
+						var inputs = $(this).find('input');
+						var slug = inputs.data('killerapps-slug');
+						var value = row[slug];
+						if (inputs.length == 1) {
+							var input = inputs.first();
+							if (input.attr('type') == 'checkbox') {
+								value = input.is(':checked');
+							} else {
+								value = input.val();
+							}
+						} else if (inputs.length > 1){
+							var input = inputs.filter('input:checked').first();
+							value = input.val();
 						}
+						row[slug] = value;
 					}
 				})
 				values.rows.push(row);
@@ -47,7 +55,6 @@
 			var input = metabox.find('.killerapps-table-metaboxes-input').first();
 			var values = get_table_values(metabox);
 			var string = $.toJSON(values);
-			
 			input.val(string);
 		}
 
